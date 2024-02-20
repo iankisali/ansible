@@ -1,0 +1,12 @@
+---
+- name: Create nginx web server
+  hosts: droplet
+  tasks:
+    - name: Tasks for the play, install nginx
+      apt:
+        name: nginx
+        state: absent
+    - name: Start nginx server
+      service: 
+        name: nginx
+        state: stopped

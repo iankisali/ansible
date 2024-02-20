@@ -1,0 +1,15 @@
+[webserver]
+44.211.171.187
+3.85.62.79
+
+[droplet]
+64.23.154.235
+165.232.133.197
+
+[webserver:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa_ssh
+ansible_user=ubuntu
+
+[droplet:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa_ssh
+ansible_user=root
