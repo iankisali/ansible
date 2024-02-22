@@ -1,0 +1,64 @@
+---
+- name: Installing docker
+  hosts: deploydocker
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: Install python3, docker
+      yum:
+        name:
+          - python3
+          - docker
+        update_cache: yes
+        state: present
+
+- name: Install docker-compose
+  hosts: deploydocker
+  become: yes
+  tasks:
+    - name: Installing Docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{lookup('pipe', 'uname -m')}}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+
+- name: Starting Docker
+  hosts: deploydocker
+  become: yes
+  tasks:
+    - name: Start docker daemon
+      systemd:
+        name: docker
+        state: started
+
+- name: Add ec2 user to docker group
+  hosts: deploydocker
+  become: yes
+  tasks:
+    - name: Add ec2 user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnect to server session
+      meta: reset_connection
+
+- name: Start docker container
+  hosts: deploydocker
+    #vars_prompt:
+    #- name: docker_password
+    #prompt: Enter password for docker registry
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Copy docker compose
+      copy:
+        src:
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Docker login
+      registry_url: https://index.docker.io/v1/
+      username: iankisali
+      password: "{{docker_password}}"
+    - name: Start container from compose
+      docker_compose:
+        project_src: /home/ec2-user
