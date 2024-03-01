@@ -34,6 +34,8 @@
 - name: Create new linux user
   hosts: all
   become: yes
+  vars:
+    user_groups: adm, docker
   roles:
     - create_user
 
